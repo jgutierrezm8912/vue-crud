@@ -94,14 +94,14 @@
       <router-link to="/" class="btn btn-danger">Cancel</router-link>
     </form>
     <!-- End of user form-->
-    <br>
+    <br />
   </div>
 </template>
 
 <script>
 import datePicker from "vue-bootstrap-datetimepicker";
 import "pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css";
-import db from "./firebaseInit";
+const SERVER_URL = "https://crud-challenge-74b3d-default-rtdb.firebaseio.com";
 export default {
   name: "edit-user",
   data() {
@@ -124,81 +124,56 @@ export default {
       },
     };
   },
-  beforeRouteEnter(to, from, next) {
-    db.collection("users")
-      .where("id", "==", Number(to.params.id))
-      .get()
-      .then((querySnapShot) => {
-        querySnapShot.forEach((doc) => {
-          next((vm) => {
-            vm.id = doc.data().id;
-            vm.firstname = doc.data().firstname;
-            vm.lastname = doc.data().lastname;
-            vm.birthdate = doc.data().birthDate;
-            vm.email = doc.data().email;
-            vm.address = {
-                id: doc.data().address.id,
-                street: doc.data().address.street,
-                city: doc.data().address.city,
-                country: doc.data().address.country,
-                postalcode: doc.data().address.postalcode,
-            }
-          });
-        });
-      });
-  },
-  watch: {
-    $route: "fetchData",
-  },
   components: {
     datePicker,
   },
+  async mounted() {
+    await this.getGameDetails();
+  },
   methods: {
-    fetchData() {
-      db.collection("users")
-        .where("id", "==", Number(this.$route.params.id))
-        .get()
-        .then((querySnapShot) => {
-          querySnapShot.forEach((doc) => {
-            this.id = doc.data().id,
-            this.firstname = doc.data().firstname,
-            this.lastname = doc.data().lastname,
-            this.birthdate = doc.data().birthDate,
-            this.email = doc.data().email,
-            this.address = doc.data().address
-          })
-        })
+    async getGameDetails() {
+      const r = await fetch(
+        `${SERVER_URL}/users/${this.$route.params.id}.json`
+      );
+      let gotUser = await r.json();
+        (this.id = gotUser.id),
+        (this.firstname = gotUser.firstname),
+        (this.lastname = gotUser.lastname),
+        (this.birthdate = gotUser.birthDate),
+        (this.email = gotUser.email),
+        (this.address = gotUser.address);
     },
-    updateUser() {
-      db.collection("users")
-        .where("id", "==", this.$route.params.id)
-        .get()
-        .then((querySnapShot) => {
-          querySnapShot.forEach((doc) => {
-            doc.ref
-              .update({
-                id: this.id,
-                firstname: this.firstname,
-                lastname: this.lastname,
-                birthDate: this.birthdate,
-                email: this.email,
-                address: {
-                  id: this.address.id,
-                  street: this.address.street,
-                  city: this.address.city,
-                  country: this.address.country,
-                  postalcode: this.address.postalcode,
-                },
-              })
-              .then(() => {
-                this.$router.push({
-                  name: "view-user",
-                  params: { id: this.id },
-                });
-              });
-          });
+    async updateUser() {
+      const payload = JSON.stringify({
+        id: this.id,
+        firstname: this.firstname,
+        lastname: this.lastname,
+        birthDate: this.birthdate,
+        email: this.email,
+        address: {
+          id: this.address.id,
+          street: this.address.street,
+          city: this.address.city,
+          country: this.address.country,
+          postalcode: this.address.postalcode,
+        },
+      });
+      const url = `${SERVER_URL}/users/${this.$route.params.id}.json`;
+      const r = await fetch(url, {
+        method: "PUT",
+        body: payload,
+        headers: {
+          "Content-type": "application/json",
+        },
+      });
+      const response = await r.json();
+      if (response) {
+        this.$router.push({
+          name: "view-user",
+          params: { id: this.$route.params.id },
         });
-    }
-  }
+      }
+    },
+  },
 };
 </script>

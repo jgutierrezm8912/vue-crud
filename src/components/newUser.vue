@@ -86,7 +86,7 @@
             id="postalcode"
             placeholder="Postal code..."
             v-model="postalcode"
-            required  
+            required
           />
         </div>
       </div>
@@ -94,53 +94,60 @@
       <router-link to="/" class="btn btn-danger">Cancel</router-link>
     </form>
     <!-- End of user form-->
-    <br>
+    <br />
   </div>
 </template>
 
 <script>
 import datePicker from "vue-bootstrap-datetimepicker";
 import "pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css";
-import db from './firebaseInit'
+const SERVER_URL = "https://crud-challenge-74b3d-default-rtdb.firebaseio.com";
 export default {
   name: "new-user",
   data() {
     return {
-        birthdate: new Date(),
-        options: {
-            format: "DD/MM/YYYY",
-            useCurrent: false,
-        },
-        id: null,
-        firstname: null,
-        lastname: null,
-        email: null,
-        street: null,
-        city: null,
-        country: null,
-        postalcode: null
-
-    }
+      birthdate: new Date(),
+      options: {
+        format: "DD/MM/YYYY",
+        useCurrent: false,
+      },
+      id: null,
+      firstname: null,
+      lastname: null,
+      email: null,
+      street: null,
+      city: null,
+      country: null,
+      postalcode: null,
+    };
   },
   methods: {
-      saveUser() {
-        const uniqueId = () => parseInt(Date.now() * Math.random());
-        db.collection('users').add({
-                id: uniqueId(),
-                firstname: this.firstname,
-                lastname: this.lastname,
-                birthDate: this.birthdate,
-                email: this.email,
-                address: {
-                    id: uniqueId(),
-                    street: this.street,
-                    city: this.city,
-                    country: this.country,
-                    postalcode: this.postalcode
-                }
-        }).then(docRef => this.$router.push("/"))
-        .catch(error => console.log(err))
-      }
+    async saveUser() {
+      const uniqueId = () => parseInt(Date.now() * Math.random());
+      const payload = JSON.stringify({
+        id: uniqueId(),
+        firstname: this.firstname,
+        lastname: this.lastname,
+        birthDate: this.birthdate,
+        email: this.email,
+        address: {
+          id: uniqueId(),
+          street: this.street,
+          city: this.city,
+          country: this.country,
+          postalcode: this.postalcode,
+        },
+      });
+      const url = `${SERVER_URL}/users.json`;
+      const r = await fetch(url, {
+        method: "POST",
+        body: payload,
+        headers: {
+          "Content-type": "application/json",
+        },
+      });
+      this.$router.push("/");
+    },
   },
   components: {
     datePicker,
