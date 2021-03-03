@@ -114,7 +114,7 @@ export default {
         `${SERVER_URL}/users/${this.$route.params.id}.json`
       );
       let gotUser = await r.json();
-        (this.id = gotUser.id),
+      (this.id = gotUser.id),
         (this.firstname = gotUser.firstname),
         (this.lastname = gotUser.lastname),
         (this.birthdate = gotUser.birthDate),
@@ -131,6 +131,11 @@ export default {
       );
       const response = await r.json();
       this.$router.push("/");
+      let toast = this.$toasted.show("User has been successfully deleted...", {
+        theme: "bubble",
+        position: "top-center",
+        duration: 5000,
+      });
     },
   },
 };

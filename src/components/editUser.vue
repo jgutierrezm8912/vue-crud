@@ -13,6 +13,8 @@
             placeholder="Firstname..."
             v-model="firstname"
             required
+            oninvalid="this.setCustomValidity('Please enter a firstname')"
+            oninput="this.setCustomValidity('')"
           />
         </div>
         <div class="form-group col-md-6">
@@ -24,6 +26,8 @@
             placeholder="Lastname..."
             v-model="lastname"
             required
+            oninvalid="this.setCustomValidity('Please enter a lastname')"
+            oninput="this.setCustomValidity('')"
           />
         </div>
       </div>
@@ -37,6 +41,8 @@
             placeholder="Email..."
             v-model="email"
             required
+            oninvalid="this.setCustomValidity('Please enter a valid email')"
+            oninput="this.setCustomValidity('')"
           />
         </div>
         <div class="form-group col-md-6">
@@ -53,6 +59,8 @@
           placeholder="Please add a street - address"
           v-model="address.street"
           required
+          oninvalid="this.setCustomValidity('Please enter a street')"
+          oninput="this.setCustomValidity('')"
         />
       </div>
       <div class="form-row">
@@ -65,6 +73,8 @@
             placeholder="City..."
             v-model="address.city"
             required
+            oninvalid="this.setCustomValidity('Please enter a city')"
+            oninput="this.setCustomValidity('')"
           />
         </div>
         <div class="form-group col-md-4">
@@ -76,6 +86,8 @@
             placeholder="Country..."
             v-model="address.country"
             required
+            oninvalid="this.setCustomValidity('Please enter a country')"
+            oninput="this.setCustomValidity('')"
           />
         </div>
         <div class="form-group col-md-2">
@@ -87,6 +99,8 @@
             placeholder="Postal code..."
             v-model="address.postalcode"
             required
+            oninvalid="this.setCustomValidity('Please enter a postal code')"
+            oninput="this.setCustomValidity('')"
           />
         </div>
       </div>
@@ -99,6 +113,9 @@
 </template>
 
 <script>
+import Vue from "vue";
+import VueToasted from "vue-toasted";
+Vue.use(VueToasted);
 import datePicker from "vue-bootstrap-datetimepicker";
 import "pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css";
 const SERVER_URL = "https://crud-challenge-74b3d-default-rtdb.firebaseio.com";
@@ -136,7 +153,7 @@ export default {
         `${SERVER_URL}/users/${this.$route.params.id}.json`
       );
       let gotUser = await r.json();
-        (this.id = gotUser.id),
+      (this.id = gotUser.id),
         (this.firstname = gotUser.firstname),
         (this.lastname = gotUser.lastname),
         (this.birthdate = gotUser.birthDate),
@@ -172,6 +189,20 @@ export default {
           name: "view-user",
           params: { id: this.$route.params.id },
         });
+        let toast = this.$toasted.show("User has been successfully edited...", {
+          theme: "bubble",
+          position: "top-center",
+          duration: 5000,
+        });
+      } else {
+        let toast = this.$toasted.show(
+          "Something went wrong, please try again...",
+          {
+            theme: "bubble",
+            position: "top-center",
+            duration: 5000,
+          }
+        );
       }
     },
   },
