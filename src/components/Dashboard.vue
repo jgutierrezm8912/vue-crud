@@ -67,14 +67,14 @@ export default {
     };
   },
   methods: {
-    async getGames() {
+    async getUsers() {
       const url = SERVER_URL + "/users.json";
       const r = await fetch(url);
       this.users = await r.json();
     },
   },
   async mounted() {
-    await this.getGames();
+    await this.getUsers();
   },
 };
 </script>

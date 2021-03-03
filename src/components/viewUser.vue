@@ -106,10 +106,10 @@ export default {
     };
   },
   async mounted() {
-    await this.getGameDetails();
+    await this.getUserDetails();
   },
   methods: {
-    async getGameDetails() {
+    async getUserDetails() {
       const r = await fetch(
         `${SERVER_URL}/users/${this.$route.params.id}.json`
       );
